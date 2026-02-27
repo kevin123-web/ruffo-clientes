@@ -91,7 +91,7 @@ export default function ClientDetailPage() {
             Agregar Mascota
           </Button>
 
-          {/* Botón Volver, mismo color */}
+          {/* Botón Volver*/}
           <Button 
             className="mt-4 w-full"
             onClick={() => router.push("/clientes")}

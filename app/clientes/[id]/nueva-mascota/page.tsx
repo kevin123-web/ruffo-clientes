@@ -1,8 +1,6 @@
 "use client"
-import { useState, useEffect } from "react" // 1. Agregamos useEffect
+import { useState, useEffect } from "react" 
 import { useRouter, useParams } from "next/navigation"
-// Ojo: revisa si es 'superbase' o 'supabase' en tu carpeta real, 
-// normalmente es 'supabase'
 import { supabase } from "@/lib/superbase/client" 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -24,7 +22,7 @@ export default function NewPetPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 2. Solo marcamos como montado cuando el navegador esté listo
+  //Solo marcamos como montado cuando el navegador esté listo
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -57,7 +55,7 @@ export default function NewPetPage() {
     router.push(`/clientes/${params.id}`)
   }
 
-  // 3. Si no ha montado, no renderizamos el Select para evitar el crash
+  //Si no ha montado, no renderizamos el Select para evitar el crash
   if (!mounted) return null 
 
   return (
@@ -106,7 +104,7 @@ export default function NewPetPage() {
             </Button>
 
             <Button 
-              type="button" // IMPORTANTE: pon type="button" para que no dispare el formulario
+              type="button" 
               variant="outline"
               className="mt-2 w-full"
               onClick={() => router.push(`/clientes/${params.id}`)}
