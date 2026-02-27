@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useCallback } from "react"
-import { supabase } from "@/lib/superbase/client" // Verifica que el nombre sea 'supabase' en tu carpeta
+import { supabase } from "@/lib/superbase/client" 
 import { Table, TableHeader, TableBody, TableRow, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
