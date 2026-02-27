@@ -1,7 +1,9 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react" // 1. Agregamos useEffect
 import { useRouter, useParams } from "next/navigation"
-import { supabase } from "@/lib/superbase/client"
+// Ojo: revisa si es 'superbase' o 'supabase' en tu carpeta real, 
+// normalmente es 'supabase'
+import { supabase } from "@/lib/superbase/client" 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,12 +13,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function NewPetPage() {
   const params = useParams()
   const router = useRouter()
+  
+  // ESTADO PARA EVITAR EL ERROR DE REMOVECHILD
+  const [mounted, setMounted] = useState(false)
+  
   const [name, setName] = useState("")
   const [species, setSpecies] = useState("")
   const [breed, setBreed] = useState("")
   const [behaviorNotes, setBehaviorNotes] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // 2. Solo marcamos como montado cuando el navegador esté listo
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,7 +37,7 @@ export default function NewPetPage() {
     }
 
     setLoading(true)
-    const { data, error } = await supabase
+    const { error: dbError } = await supabase
       .from("pets")
       .insert([{ 
         client_id: params.id, 
@@ -35,18 +46,19 @@ export default function NewPetPage() {
         breed, 
         behavior_notes: behaviorNotes 
       }])
-      .select()
-      .single()
-    setLoading(false)
-
-    if (error) {
+    
+    if (dbError) {
       setError("Error al crear la mascota")
-      console.log(error)
+      console.error(dbError)
+      setLoading(false)
       return
     }
 
     router.push(`/clientes/${params.id}`)
   }
+
+  // 3. Si no ha montado, no renderizamos el Select para evitar el crash
+  if (!mounted) return null 
 
   return (
     <div className="flex justify-center p-4">
@@ -63,7 +75,8 @@ export default function NewPetPage() {
               required
             />
 
-            <Select onValueChange={(val) => setSpecies(val)} value={species}>
+            {/* El Select suele causar el error si se renderiza en el servidor */}
+            <Select onValueChange={setSpecies} value={species}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona especie" />
               </SelectTrigger>
@@ -92,9 +105,10 @@ export default function NewPetPage() {
               {loading ? "Guardando..." : "Guardar Mascota"}
             </Button>
 
-            {/* Botón Volver al detalle del cliente */}
             <Button 
-              className="mt-4 w-full"
+              type="button" // IMPORTANTE: pon type="button" para que no dispare el formulario
+              variant="outline"
+              className="mt-2 w-full"
               onClick={() => router.push(`/clientes/${params.id}`)}
             >
               ← Volver al detalle
